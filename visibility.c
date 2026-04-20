@@ -9,8 +9,7 @@
 /*   Updated: 2026/04/19 16:02:57 by bokgoh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-int	check_col_up(int grid[4][4], int clues[16])
+int	check_col_up(int **grid, int *clues, int n)
 {
 	int	col;
 	int	row;
@@ -18,12 +17,12 @@ int	check_col_up(int grid[4][4], int clues[16])
 	int	count;
 
 	col = -1;
-	while (++col < 4)
+	while (++col < n)
 	{
 		row = -1;
 		max = 0;
 		count = 0;
-		while (++row < 4)
+		while (++row < n)
 		{
 			if (grid[row][col] > max)
 			{
@@ -37,7 +36,7 @@ int	check_col_up(int grid[4][4], int clues[16])
 	return (1);
 }
 
-int	check_col_down(int grid[4][4], int clues[16])
+int	check_col_down(int **grid, int *clues, int n)
 {
 	int	col;
 	int	row;
@@ -45,9 +44,9 @@ int	check_col_down(int grid[4][4], int clues[16])
 	int	count;
 
 	col = -1;
-	while (++col < 4)
+	while (++col < n)
 	{
-		row = 4;
+		row = n;
 		max = 0;
 		count = 0;
 		while (--row >= 0)
@@ -58,26 +57,26 @@ int	check_col_down(int grid[4][4], int clues[16])
 				count++;
 			}
 		}
-		if (clues[4 + col] != count)
+		if (clues[n + col] != count)
 			return (0);
 	}
 	return (1);
 }
 
-int	check_row_left(int grid[4][4], int clues[16])
+int	check_row_left(int **grid, int *clues, int n)
 {
-	int	row;
 	int	col;
+	int	row;
 	int	max;
 	int	count;
 
 	row = -1;
-	while (++row < 4)
+	while (++row < n)
 	{
 		col = -1;
 		max = 0;
 		count = 0;
-		while (++col < 4)
+		while (++col < n)
 		{
 			if (grid[row][col] > max)
 			{
@@ -85,23 +84,23 @@ int	check_row_left(int grid[4][4], int clues[16])
 				count++;
 			}
 		}
-		if (clues[8 + row] != count)
+		if (clues[2 * n + row] != count)
 			return (0);
 	}
 	return (1);
 }
 
-int	check_row_right(int grid[4][4], int clues[16])
+int	check_row_right(int **grid, int *clues, int n)
 {
-	int	row;
 	int	col;
+	int	row;
 	int	max;
 	int	count;
 
 	row = -1;
-	while (++row < 4)
+	while (++row < n)
 	{
-		col = 4;
+		col = n;
 		max = 0;
 		count = 0;
 		while (--col >= 0)
@@ -112,20 +111,21 @@ int	check_row_right(int grid[4][4], int clues[16])
 				count++;
 			}
 		}
-		if (clues[12 + row] != count)
+		if (clues[3 * n + row] != count)
 			return (0);
 	}
 	return (1);
 }
 
-int	check_all_clues(int grid[4][4], int clues[16])
+int	check_all_clues(int **grid, int *clues, int n)
 {
-	if (check_col_up(grid, clues) == 1
-		&& check_col_down(grid, clues) == 1
-		&& check_row_left(grid, clues) == 1
-		&& check_row_right(grid, clues) == 1)
-	{
-		return (1);
-	}
-	return (0);
+	if (check_col_up(grid, clues, n) == 0)
+		return (0);
+	if (check_col_down(grid, clues, n) == 0)
+		return (0);
+	if (check_row_left(grid, clues, n) == 0)
+		return (0);
+	if (check_row_right(grid, clues, n) == 0)
+		return (0);
+	return (1);
 }
