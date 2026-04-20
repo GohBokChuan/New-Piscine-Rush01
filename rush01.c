@@ -12,9 +12,9 @@
 
 #include <unistd.h>
 
-int	check_all_clues(int grid[4][4], int clues[16]);
+int	check_all_clues(int **grid, int *clues, int n);
 
-int	parse_input(char *str, int *clues)
+int	parse_input(char *str, int *clues, int n)
 {
 	int	i;
 	int	count;
@@ -23,52 +23,68 @@ int	parse_input(char *str, int *clues)
 	count = 0;
 	while (str[i] != '\0')
 	{
-		if (str[i] >= '1' && str[i] <= '4')
+		if (str[i] >= '1' && str[i] <= '9')
 		{
 			clues[count] = str[i] - '0';
 			count++;
 		}
-		else if (str[i] != ' ')
+		else if (str[i] == ' ')
+		{
+		}
+		else
+		{
 			return (0);
+		}
 		i++;
 	}
-	if (count == 16)
+	if (count == n * 4)
 		return (1);
-	return (0);
+	else
+		return (0);
 }
 
-int	check_double(int grid[4][4], int row, int col, int num)
+int	check_double(int **grid, int pos, int num, int n)
 {
 	int	i;
+	int	row;
+	int	col;
 
+	row = pos / n;
+	col = pos % n;
 	i = 0;
-	while (i < 4)
+	while (i < n)
 	{
 		if (grid[row][i] == num)
+		{
 			return (0);
+		}
 		if (grid[i][col] == num)
+		{
 			return (0);
+		}
 		i++;
 	}
 	return (1);
 }
 
-void	print_grid(int grid[4][4])
+void	print_grid(int **grid, int n)
 {
 	int		row;
 	int		col;
 	char	c;
 
 	row = 0;
-	while (row < 4)
+	while (row < n)
 	{
 		col = 0;
-		while (col < 4)
+		while (col < n)
 		{
 			c = grid[row][col] + '0';
 			write(1, &c, 1);
-			if (col < 3)
+			if (col < n - 1)
+			{
 				write(1, " ", 1);
+			}
 			col++;
 		}
 		write(1, "\n", 1);
@@ -76,26 +92,29 @@ void	print_grid(int grid[4][4])
 	}
 }
 
-int	solve(int grid[4][4], int clues[16], int pos)
+int	solve(int **grid, int *clues, int pos, int n)
 {
 	int	row;
 	int	col;
 	int	num;
 
-	if (pos == 16)
-		return (check_all_clues(grid, clues));
-	row = pos / 4;
-	col = pos % 4;
-	num = 0;
-	while (++num <= 4)
+	if (pos == n * n)
+		return (check_all_clues(grid, clues, n));
+	row = pos / n;
+	col = pos % n;
+	num = 1;
+	while (num <= n)
 	{
-		if (check_double(grid, row, col, num) == 1)
+		if (check_double(grid, pos, num, n) == 1)
 		{
 			grid[row][col] = num;
-			if (solve(grid, clues, pos + 1) == 1)
+			if (solve(grid, clues, pos + 1, n) == 1)
+			{
 				return (1);
+			}
 			grid[row][col] = 0;
 		}
+		num++;
 	}
 	return (0);
 }
