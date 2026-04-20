@@ -9,34 +9,99 @@
 /*   Updated: 2026/04/19 16:17:37 by bokgoh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include <unistd.h>
+#include <stdlib.h>
 
-int		parse_input(char *str, int *clues);
-int		solve(int grid[4][4], int *clues, int pos);
-void	print_grid(int grid[4][4]);
+int		parse_input(char *str, int *clues, int n);
+int		solve(int **grid, int *clues, int pos, int n);
+void	print_grid(int **grid, int n);
+
+int	ft_error(void)
+{
+	write(1, "Error\n", 6);
+	return (0);
+}
+
+int	get_n(char *str)
+{
+	int	count;
+	int	i;
+
+	count = 0;
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] >= '1' && str[i] <= '9')
+			count++;
+		i++;
+	}
+	if (count % 4 != 0 || count == 0)
+		return (0);
+	return (count / 4);
+}
+
+int	**allocate_grid(int n)
+{
+	int	**grid;
+	int	row;
+	int	col;
+
+	grid = (int **)malloc(sizeof(int *) * n);
+	row = 0;
+	while (row < n)
+	{
+		grid[row] = (int *)malloc(sizeof(int) * n);
+		col = 0;
+		while (col < n)
+		{
+			grid[row][col] = 0;
+			col++;
+		}
+		row++;
+	}
+	return (grid);
+}
+
+void	free_all(int **grid, int *clues, int n)
+{
+	int	i;
+
+	i = 0;
+	if (grid)
+	{
+		while (i < n)
+		{
+			free(grid[i]);
+			i++;
+		}
+		free(grid);
+	}
+	if (clues)
+		free(clues);
+}
 
 int	main(int argc, char **argv)
 {
-	int	clues[16];
-	int	grid[4][4];
-	int	i;
-	int	j;
+	int	*clues;
+	int	**grid;
+	int	n;
 
-	i = 0;
-	while (i < 4)
+	if (argc != 2)
+		return (ft_error());
+	n = get_n(argv[1]);
+	if (n == 0)
+		return (ft_error());
+	clues = (int *)malloc(sizeof(int) * (n * 4));
+	if (parse_input(argv[1], clues, n) == 0)
 	{
-		j = 0;
-		while (j < 4)
-		{
-			grid[i][j] = 0;
-			j++;
-		}
-		i++;
+		free(clues);
+		return (ft_error());
 	}
-	if (argc == 2 && parse_input(argv[1], clues) && solve(grid, clues, 0))
-		print_grid(grid);
+	grid = allocate_grid(n);
+	if (solve(grid, clues, 0, n) == 1)
+		print_grid(grid, n);
 	else
-		write(1, "Error\n", 6);
+		ft_error();
+	free_all(grid, clues, n);
 	return (0);
 }
